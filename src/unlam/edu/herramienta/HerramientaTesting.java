@@ -33,6 +33,8 @@ import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.SwingConstants;
+import javax.swing.border.LineBorder;
 
 public class HerramientaTesting extends JFrame {
 
@@ -154,6 +156,60 @@ public class HerramientaTesting extends JFrame {
 		codeTextPane = new JTextPane();
 		codeTextPane.setEditable(false);
 		scrollPane_3.setViewportView(codeTextPane);
+		
+		JLabel lblAnalisisDelMetodo = new JLabel("Analisis del metodo");
+		lblAnalisisDelMetodo.setBackground(new Color(240, 240, 240));
+		lblAnalisisDelMetodo.setForeground(new Color(0, 0, 128));
+		lblAnalisisDelMetodo.setFont(new Font("Tahoma", Font.BOLD, 11));
+		lblAnalisisDelMetodo.setBounds(565, 4, 115, 14);
+		contentPane.add(lblAnalisisDelMetodo);
+		
+		JPanel panel = new JPanel();
+		panel.setOpaque(false);
+		panel.setBorder(new LineBorder(new Color(128, 128, 128)));
+		panel.setBounds(553, 36, 258, 362);
+		contentPane.add(panel);
+		panel.setLayout(null);
+		
+		JLabel lblLineasDeCodigoTotales = new JLabel("Lineas de codigo totales:");
+		lblLineasDeCodigoTotales.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLineasDeCodigoTotales.setBounds(10, 11, 238, 14);
+		panel.add(lblLineasDeCodigoTotales);
+		
+		JLabel lblLineasDeCodigoComentadas = new JLabel("Lineas de codigo comentadas:");
+		lblLineasDeCodigoComentadas.setHorizontalAlignment(SwingConstants.CENTER);
+		lblLineasDeCodigoComentadas.setBounds(10, 51, 238, 14);
+		panel.add(lblLineasDeCodigoComentadas);
+		
+		JLabel lblPorcentajeDeLinea = new JLabel("Porcentaje de lineas de codigo comentadas:");
+		lblPorcentajeDeLinea.setHorizontalAlignment(SwingConstants.CENTER);
+		lblPorcentajeDeLinea.setBounds(10, 91, 238, 14);
+		panel.add(lblPorcentajeDeLinea);
+		
+		JLabel lblComplejidadCiclomatica = new JLabel("Complejidad ciclomatica:");
+		lblComplejidadCiclomatica.setHorizontalAlignment(SwingConstants.CENTER);
+		lblComplejidadCiclomatica.setBounds(10, 131, 238, 14);
+		panel.add(lblComplejidadCiclomatica);
+		
+		JLabel lblFanIn = new JLabel("Fan in:");
+		lblFanIn.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFanIn.setBounds(10, 171, 238, 14);
+		panel.add(lblFanIn);
+		
+		JLabel lblFanOut = new JLabel("Fan out:");
+		lblFanOut.setHorizontalAlignment(SwingConstants.CENTER);
+		lblFanOut.setBounds(10, 211, 238, 14);
+		panel.add(lblFanOut);
+		
+		JLabel lblHalsteadLongitud = new JLabel("Halstead longitud:");
+		lblHalsteadLongitud.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHalsteadLongitud.setBounds(10, 251, 238, 14);
+		panel.add(lblHalsteadLongitud);
+		
+		JLabel lblHalsteadVolumen = new JLabel("Halstead volumen:");
+		lblHalsteadVolumen.setHorizontalAlignment(SwingConstants.CENTER);
+		lblHalsteadVolumen.setBounds(10, 291, 238, 14);
+		panel.add(lblHalsteadVolumen);
 	}
 	
 	private void abrirCarpeta() {		
