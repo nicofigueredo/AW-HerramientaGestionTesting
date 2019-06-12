@@ -10,14 +10,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -25,10 +24,9 @@ import javax.swing.JList;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
@@ -82,8 +80,24 @@ public class HerramientaTesting extends JFrame {
 		mnAnalisis.add(mntmElegirCarpeta);
 
 		JMenuItem mntmSalirCtrl = new JMenuItem("Salir");
+		mntmSalirCtrl.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.exit(0);
+			}
+		});
 		mntmSalirCtrl.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_MASK));
 		mnAnalisis.add(mntmSalirCtrl);
+		
+		JMenu mnAyuda = new JMenu("Ayuda");
+		menuBar.add(mnAyuda);
+		
+		JMenuItem mntmAcercaDe = new JMenuItem("Acerca de...");
+		mntmAcercaDe.addActionListener(mostrarAcercaDe);
+		
+		JMenuItem mntmAyuda = new JMenuItem("Ayuda");
+		mntmAyuda.addActionListener(mostrarAyuda);
+		mnAyuda.add(mntmAyuda);
+		mnAyuda.add(mntmAcercaDe);
 	}
 
 	public void initMetricLabels() {
@@ -173,6 +187,16 @@ public class HerramientaTesting extends JFrame {
 		lblHalsteadVolumenResult.setHorizontalAlignment(SwingConstants.CENTER);
 		lblHalsteadVolumenResult.setBounds(10, 311, 238, 14);
 		panel.add(lblHalsteadVolumenResult);
+		
+		JButton halsteadButton = new JButton("?");
+		halsteadButton.addActionListener(mostrarOperadoresHalstead);
+		halsteadButton.setBounds(203, 246, 45, 24);
+		panel.add(halsteadButton);
+		
+		JButton halsteadButton2 = new JButton("?");
+		halsteadButton2.addActionListener(mostrarOperadoresHalstead);
+		halsteadButton2.setBounds(203, 286, 45, 24);
+		panel.add(halsteadButton2);
 	}
 
 	public HerramientaTesting() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
@@ -260,18 +284,19 @@ public class HerramientaTesting extends JFrame {
 
 	}
 
+	private DefaultListModel<String> filenames;
+	
 	ActionListener cargarArchivos = new ActionListener() {
+		
+
 		public void actionPerformed(ActionEvent e) {
 			fileChooser = new JFileChooser();
 			fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 			int fileChooserResult = fileChooser.showOpenDialog(null);
 			if (fileChooserResult == JFileChooser.APPROVE_OPTION) {
 				File carpeta = fileChooser.getSelectedFile();
-				
-				// File[] archivos = carpeta.listFiles(javaFilter);
 				List<File> archivos = listAllSubfiles(carpeta);
-				
-				DefaultListModel<String> filenames = new DefaultListModel<>();
+				filenames = new DefaultListModel<>();
 				for (File file : archivos) {
 					filenames.addElement(file.getAbsolutePath());
 				}
@@ -298,14 +323,15 @@ public class HerramientaTesting extends JFrame {
 		if(files == null || files.length == 0)
 			return;
 		for (File file : files) {
-			if(file.isFile())
+			if(file.isFile() && file.getName().endsWith(".java"))
 				list.add(file);
 			addSubFilesToList(list, file);
 		}
 	}
 
 	private List<Clase> clasesProyecto;
-
+	private DefaultListModel<String> classnames;
+	
 	MouseListener cargarClases = new MouseAdapter() {
 		@Override
 		public void mouseClicked(MouseEvent e) {
@@ -313,17 +339,20 @@ public class HerramientaTesting extends JFrame {
 				return;
 			String filename = filesList.getSelectedValue().toString();
 			clasesProyecto = new LectorJavaParserAvanzado().leerProyecto(new File(filename));
-			DefaultListModel<String> classnames = new DefaultListModel<>();
+			classnames = new DefaultListModel<>();
+			methodnames = new DefaultListModel<>();
 			for (int indice = 0; indice < clasesProyecto.size(); indice++) {
 				classnames.addElement(clasesProyecto.get(indice).getNombre());
 			}
+			methodsList.setModel(methodnames);
 			classesList.setModel(classnames);
 		}
 	};
 
 	private List<Metodo> metodosClaseElegida;
-
-	MouseListener cargarMetodos = new MouseAdapter() {
+	private DefaultListModel<String> methodnames;
+	
+	MouseListener cargarMetodos = new MouseAdapter() {	
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			if (classesList.getSelectedIndex() == -1)
@@ -332,7 +361,7 @@ public class HerramientaTesting extends JFrame {
 			Clase claseElegida = clasesProyecto.get(claseSeleccionada);
 			metodosClaseElegida = claseElegida.getMetodos();
 
-			DefaultListModel<String> methodnames = new DefaultListModel<>();
+			methodnames = new DefaultListModel<>();
 			for (int indice = 0; indice < metodosClaseElegida.size(); indice++) {
 				methodnames.addElement(metodosClaseElegida.get(indice).getNombre());
 			}
@@ -357,6 +386,8 @@ public class HerramientaTesting extends JFrame {
 		return resultados;
 	}
 
+	private String halstead[];
+	
 	MouseListener cargarCodigoYmetricas = new MouseAdapter() {
 
 		public void mouseClicked(MouseEvent e) {
@@ -405,10 +436,7 @@ public class HerramientaTesting extends JFrame {
 			}
 			lblPorcentajeDeLineasDeCodigoComentadasResult.setText(String.format("%.2f", porcentajeComentarios) + "%");
 
-			/**
-			 * Halstead
-			 */
-			String halstead[] = resultados.get(3).getResultado().split(" ");
+			halstead = resultados.get(3).getResultado().split(" ");
 			lblHalsteadLongitudResult.setText(halstead[1]);
 			lblHalsteadVolumenResult.setText(halstead[3]);
 
@@ -421,4 +449,40 @@ public class HerramientaTesting extends JFrame {
 		}
 	};
 
+    ActionListener mostrarOperadoresHalstead = new ActionListener() {
+
+        public void actionPerformed(ActionEvent e) {
+            String msg = "Operadores considerados:\n";
+            for (String operador : Halstead.getOperadores()) {
+                msg += operador + " , ";
+            }
+
+            if (halstead != null) {
+                msg += "\n\n";
+                msg += "n1 : " + String.format("%3s", halstead[5]) + "     Operadores unicos. \n";
+                msg += "N1 : " + String.format("%3s", halstead[7]) + "     Operadores. \n";
+                msg += "n2 : " + String.format("%3s", halstead[9]) + "     Operandos unicos. \n";
+                msg += "N2 : " + String.format("%3s", halstead[11]) + "    Operandos.\n";
+            }
+
+            JOptionPane.showMessageDialog(new JFrame(), msg, "Informacion - Halstead", JOptionPane.INFORMATION_MESSAGE);
+
+        }
+    };
+    
+    ActionListener mostrarAcercaDe = new ActionListener() {
+    	public void actionPerformed(ActionEvent e) {
+    		String msg = "Grupo 5\nNicolas Figueredo\nAtsel de Arias\nPablo Sebastian Garcia\nAlan Nina Rossi";
+    		JOptionPane.showMessageDialog(new JFrame(), msg, "Acerca de", JOptionPane.INFORMATION_MESSAGE);
+    	}
+    };
+    
+    ActionListener mostrarAyuda = new ActionListener() {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String msg = "¿Por que no aparece mi archivo? \tPor que se trata de una interfaz";
+			//Seguir agregando
+			JOptionPane.showMessageDialog(new JFrame(), msg, "Ayuda", JOptionPane.INFORMATION_MESSAGE);
+		}
+	};
 }
